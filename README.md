@@ -1,2 +1,2 @@
 # snippets
-Resources for CS327E Spring 21
+Code snippets and guides for CS327E Spring 21
