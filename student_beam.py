@@ -61,8 +61,8 @@ class FormatDOB(beam.DoFn):
     return [record]
            
 def run():
-     PROJECT_ID = 'my-project'
-     BUCKET = 'gs://my-bucket/temp'
+     PROJECT_ID = 'cs327e-sp2021'
+     BUCKET = 'gs://cs327e-sp2021-dataflow/temp'
 
      options = {
      'project': PROJECT_ID
@@ -71,7 +71,7 @@ def run():
 
      p = beam.Pipeline('DirectRunner', options=opts)
 
-     sql = 'SELECT sid, fname, lname, dob, status FROM college.Student limit 50'
+     sql = 'SELECT sid, fname, lname, dob, status FROM college_beam.Student limit 50'
      bq_source = ReadFromBigQuery(query=sql, use_standard_sql=True, gcs_location=BUCKET)
 
      query_results = p | 'Read from BQ' >> beam.io.Read(bq_source)
@@ -80,7 +80,7 @@ def run():
 
      out_pcoll | 'Log output' >> WriteToText('output.txt')
 
-     dataset_id = 'college'
+     dataset_id = 'college_beam'
      table_id = PROJECT_ID + ':' + dataset_id + '.' + 'Student_Beam'
      schema_id = 'sid:STRING,fname:STRING,lname:STRING,dob:DATE,status:STRING'
 

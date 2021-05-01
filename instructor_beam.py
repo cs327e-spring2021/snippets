@@ -6,15 +6,16 @@ from apache_beam.io.gcp.bigquery import ReadFromBigQuery, WriteToBigQuery
 class FormatName(beam.DoFn):
   def process(self, element):
     tid = element['tid']
-    instructor = element['instructor']
+    name = element['name']
     dept = element['dept']
-
-    split_name = instructor.split(',')
+    
+    split_name = name.split(',')
+    
     if len(split_name) > 1:
         lname = split_name[0]
         fname = split_name[1]
     else:
-        split_name = instructor.split(' ')
+        split_name = name.split(' ')
         fname = split_name[0]
         lname = split_name[1]
         
@@ -22,8 +23,8 @@ class FormatName(beam.DoFn):
     return [record]
            
 def run():
-     PROJECT_ID = 'my-project'
-     BUCKET = 'gs://my-bucket/temp'
+     PROJECT_ID = 'cs327e-sp2021'
+     BUCKET = 'gs://cs327e-sp2021-dataflow/temp'
 
      options = {
      'project': PROJECT_ID
@@ -32,7 +33,7 @@ def run():
 
      p = beam.Pipeline('DirectRunner', options=opts)
 
-     sql = 'SELECT tid, instructor, dept FROM college.Instructor limit 50'
+     sql = 'SELECT tid, name, dept FROM college_beam.Instructor limit 50'
      bq_source = ReadFromBigQuery(query=sql, use_standard_sql=True, gcs_location=BUCKET)
 
      query_results = p | 'Read from BQ' >> beam.io.Read(bq_source)
@@ -41,7 +42,7 @@ def run():
 
      out_pcoll | 'Log output' >> WriteToText('output.txt')
 
-     dataset_id = 'college'
+     dataset_id = 'college_beam'
      table_id = PROJECT_ID + ':' + dataset_id + '.' + 'Instructor_Beam'
      schema_id = 'tid:STRING,fname:STRING,lname:STRING,dept:STRING'
 
